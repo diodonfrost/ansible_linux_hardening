@@ -1,0 +1,157 @@
+---
+# tasks file for auditd
+
+- name: install audit
+  package: 
+    name: audit 
+    state: latest
+
+- name: Record access events
+  template: 
+    src: audit/access.rules 
+    dest: /etc/audit/rules.d/access.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Record sudoers action events
+  template: 
+    src: audit/actions.rules 
+    dest: /etc/audit/rules.d/action.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Record networking events 
+  template: 
+    src: audit/audit_rules_networkconfig_modification.rules 
+    dest: /etc/audit/rules.d/audit_rules_networkconfig_modification.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Record usergroup modification events
+  template: 
+    src: audit/audit_rules_usergroup_modification.rules 
+    dest: /etc/audit/rules.d/audit_rules_usergroup_modification.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Record audit time events modification
+  template: 
+    src: audit/audit_time_rules.rules 
+    dest: /etc/audit/rules.d/audit_time_rules.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Record deleting events
+  template: 
+    src: audit/delete.rules 
+    dest: /etc/audit/rules.d/delete.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Record export events
+  template: 
+    src: audit/export.rules 
+    dest: /etc/audit/rules.d/export.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Record selinux MAC policy events modification
+  template: 
+    src: audit/MAC_policy.rules 
+    dest: /etc/audit/rules.d/MAC_policy.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Record module kernel events
+  template: 
+    src: audit/modules.rules 
+    dest: /etc/audit/rules.d/modules.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Record permission events modification
+  template: 
+    src: audit/perm_mod.rules 
+    dest: /etc/audit/rules.d/perm_mod.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Record loging session events
+  template: 
+    src: audit/session.rules 
+    dest: /etc/audit/rules.d/session.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Make the auditd Configuration Immutable
+  template: 
+    src: audit/immutable.rules 
+    dest: /etc/audit/rules.d/immutable.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Record login events
+  template: 
+    src: audit/logins.rules 
+    dest: /etc/audit/rules.d/logins.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Record time change events
+  template: 
+    src: audit/time_change.rules 
+    dest: /etc/audit/rules.d/time_change.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Record command with hight privilege execution
+  template: 
+    src: audit/privileged.rules 
+    dest: /etc/audit/rules.d/privileged.rules 
+    owner: root 
+    group: root
+  notify: restart auditd
+
+- name: Configure auditd admin_space_left action on low disk space
+  lineinfile: 
+    dest: /etc/audit/auditd.conf 
+    regexp: '^admin_space_left_action =' 
+    line: 'admin_space_left_action = single'
+  notify: restart auditd
+
+- name: Configure audit space_left action on low disk space
+  lineinfile: 
+    dest: /etc/audit/auditd.conf 
+    regexp: '^space_left_action =' 
+    line: 'space_left_action = email'
+  notify: restart auditd
+
+- name: Configure auditd flush priority
+  lineinfile:
+    dest: /etc/audit/auditd.conf
+    regexp: '^flush ='
+    line: 'flush = data'
+  notify: restart auditd
+
+- name: Configure auditd to use audispd's syslog plugin
+  lineinfile: 
+    dest: /etc/audisp/plugins.d/syslog.conf 
+    regexp: '^active =' 
+    line: 'active = yes'
+  notify: restart auditd
+
+

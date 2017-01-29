@@ -1,0 +1,28 @@
+---
+# tasks file for filesystem
+
+#
+
+- name: Harden permission of /usr/lib and /usr/lib64
+  file:
+    path: "{{item}}"
+    state: directory
+    mode: "g-w,o-w"
+  with_items:
+    - /usr/lib
+    - /usr/lib64
+  when: security_standard == "stig-rhel7" or security_standard == "rht-ccp"
+
+- name: harden permission of /var/log
+  file:
+    path: "{{item}}"
+    mode: "0600"
+  with_items:
+    - /var/log/messages
+    - /var/log/secure
+    - /var/log/maillog
+    - /var/log/spooler
+    - /var/log/cron
+    - /var/log/boot.log
+  when: security_standard == "pci-dss"
+

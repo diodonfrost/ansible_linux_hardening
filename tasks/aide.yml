@@ -1,0 +1,32 @@
+---
+# tasks file for aide
+
+- name: Install and configure AIDE
+  yum: 
+    name: aide 
+    state: latest 
+    update_cache: yes
+  notify: init aide
+
+- name: Set crontab for Aide
+  cron: 
+    name: "cron AIDE" 
+    minute: "0" 
+    hour: "5" 
+    job: "/usr/sbin/aide --check"
+  notify: check aide
+
+- name: Install prelink
+  yum: 
+    name: prelink 
+    state: latest 
+    update_cache: yes
+
+- name: Disable prelink 
+  lineinfile: 
+    dest: /etc/sysconfig/prelink 
+    regexp: '^PRELINKING='
+    line: 'PRELINKING=no'
+  notify: prelinking
+
+

@@ -1,0 +1,12 @@
+---
+# security_standard: "pci-dss"
+# security_standard: "stig-rhel7"
+# security_standard: "rht-ccp"
+- hosts: localhost
+  vars:
+    security_standard: "pci-dss"
+
+  roles:
+    - ansible_linux_hardening
+
+

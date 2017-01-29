@@ -1,0 +1,43 @@
+---
+# tasks file for main
+
+- include: aide.yml
+  tags: 
+    - aide
+
+- include: audit.yml
+  tags: 
+    - audit
+
+- include: filesystem.yml
+  tags:
+    - filesystem
+
+- include: firewalld.yml
+  tags:
+    - firewalld
+
+- include: kernel.yml
+  tags:
+    - kernel
+
+- include: packages.yml
+  tags:
+    - packages
+
+- include: pam.yml
+  tags:
+    - pam
+
+- include: selinux.yml
+  tags:
+    - selinux
+
+- include: sshd.yml
+  tags:
+    - sshd
+
+- include: update_system.yml
+  tags:
+    - update_system
+

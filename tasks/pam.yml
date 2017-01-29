@@ -1,0 +1,134 @@
+---
+# tasks file for pam
+
+- include_vars: "pci-dss.yml"
+  when: security_standard == "pci-dss"
+
+- include_vars: "stig-rhel7.yml"
+  when: security_standard == "stig-rhel7"
+
+- include_vars: "rht-ccp.yml"
+  when: security_standard == "rht-ccp"
+
+- name: Disable root login
+  template:
+    src: pam/securetty.client
+    dest: /etc/securetty
+  when: security_standard == "stig-rhel7"
+
+- name: Limit the number of concurrent login sessions allowed per user
+  lineinfile:
+    dest: /etc/security/limits.conf
+    regexp: '^\* hard maxlogins'
+    line: '* hard maxlogins 10'
+  when: security_standard == "stig-rhel7"
+
+- name: disable login without password 
+  replace: 
+    dest: /etc/pam.d/system-auth 
+    regexp: 'nullok' 
+    replace: ''
+ 
+- name: Define password maximum age
+  lineinfile: 
+    dest: /etc/login.defs 
+    regexp: '^PASS_MAX_DAYS'
+    line: 'PASS_MAX_DAYS {{ pass_max_days }}'
+
+- name: Set password minimum age
+  lineinfile:
+    dest: /etc/login.defs 
+    regexp: '^PASS_MIN_DAYS'
+    line: 'PASS_MIN_DAYS {{ pass_min_days }}'
+
+- name: To specify the number of days after a password expires (which signifies inactivity) until an account is permanently disabled
+  lineinfile: 
+    dest: /etc/default/useradd 
+    regexp: '^INACTIVE' 
+    line: 'INACTIVE={{ account_inactive }}'
+
+- name: The pam_pwquality module's dcredit parameter controls requirements for usage of digits in a password. When set to a negative number, any password will be required to contain that many digits
+  lineinfile: 
+    dest: /etc/security/pwquality.conf 
+    regexp: '^dcredit =' 
+    line: 'dcredit = {{ pass_strength_min_digit }}'
+
+- name: Set password minimum length
+  lineinfile: 
+    dest: /etc/security/pwquality.conf 
+    regexp: '^minlen ='
+    line: 'minlen = {{ pass_length_min }}'
+
+- name: Set password strength minimum uppercase characters
+  lineinfile: 
+    dest: /etc/security/pwquality.conf 
+    regexp: '^ucredit =' 
+    line: 'ucredit = {{ pass_strenght_min_uppercase }}'
+
+- name: Set password strength minimum lowercase characters
+  lineinfile: 
+    dest: /etc/security/pwquality.conf 
+    regexp: '^lcredit =' 
+    line: 'lcredit = {{ pass_strenght_min_lowercase }}'
+
+- name: Set password strength minimum special characteres
+  lineinfile: 
+    dest: /etc/security/pwquality.conf 
+    regexp: '^ocredit =' 
+    line: 'ocredit = {{ pass_strenght_min_special }}'
+
+- name: Set password strength minimum different characters
+  lineinfile: 
+    dest: /etc/security/pwquality.conf 
+    regexp: '^difok =' 
+    line: 'difok = {{ pass_length_min }}'
+
+- name: Limit password reuse
+  lineinfile: 
+    dest: /etc/pam.d/system-auth 
+    regexp: '^password    sufficient    pam_unix.so sha512 shadow  try_first_pass' 
+    line: 'password    sufficient    pam_unix.so sha512 shadow  try_first_pass use_authtok remember=5'
+
+- name: Set deny for failed password attempts in system-auth
+  lineinfile: 
+    dest: /etc/pam.d/system-auth 
+    regexp: '^auth        required      pam_faillock.so preauth silent deny=' 
+    insertbefore: 'auth        sufficient    pam_unix.so' 
+    line: 'auth        required      pam_faillock.so preauth silent deny={{ password_deny_fail }} unlock_time={{ password_unlock_time }} fail_interval={{ password_fail_interval }}'
+
+- name: Set deny for failed password attempts in password-auth
+  lineinfile: 
+    dest: /etc/pam.d/password-auth 
+    regexp: '^auth        required      pam_faillock.so preauth silent deny=' 
+    insertbefore: 'auth        sufficient    pam_unix.so' 
+    line: 'auth        required      pam_faillock.so preauth silent deny={{ password_deny_fail }} unlock_time={{ password_unlock_time }} fail_interval={{ password_fail_interval }}'
+
+- name: Set lockout time for failed password attempts in system-auth
+  lineinfile: 
+    dest: /etc/pam.d/system-auth 
+    regexp: '^auth        \[default=die\] pam_faillock.so authfail deny=' 
+    insertafter: 'auth        sufficient    pam_unix.so'  
+    line: 'auth        [default=die] pam_faillock.so authfail deny={{ password_deny_fail }} unlock_time={{ password_unlock_time }} fail_interval={{ password_fail_interval }}'
+
+- name: Set lockout time for failed password attempts in password-auth
+  lineinfile: 
+    dest: /etc/pam.d/password-auth 
+    regexp: '^auth        \[default=die\] pam_faillock.so authfail deny=' 
+    insertafter: 'auth        sufficient    pam_unix.so'  
+    line: 'auth        [default=die] pam_faillock.so authfail deny={{ password_deny_fail }} unlock_time={{ password_unlock_time }} fail_interval={{ password_fail_interval }}'
+
+- name: Login requiere password in system-auth
+  lineinfile: 
+    dest: /etc/pam.d/system-auth 
+    regexp: '^account     required      pam_faillock.so' 
+    insertbefore: 'account     required      pam_unix.so' 
+    line: 'account     required      pam_faillock.so'
+
+- name: Login requiere password in password-auth
+  lineinfile: 
+    dest: /etc/pam.d/password-auth 
+    regexp: '^account     required      pam_faillock.so' 
+    insertbefore: 'account     required      pam_unix.so' 
+    line: 'account     required      pam_faillock.so'
+
+

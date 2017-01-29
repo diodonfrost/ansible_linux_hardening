@@ -1,0 +1,41 @@
+---
+# tasks file for SELinux
+
+- name: selinux config
+  selinux: 
+    policy: targeted
+    state: enforcing
+  notify: reboot computer
+
+- name: install tools for manage selinux
+  package:
+    name: policycoreutils-python
+    state: latest
+  ignore_errors: True
+
+- name: install tools for debug selinux
+  package:
+    name: setroubleshoot-server
+    state: latest
+  ignore_errors: True
+
+- name: Set boolean
+  seboolean:
+    name: "{{item}}"
+    state: yes 
+    persistent: yes
+  with_items:
+   - deny_ptrace
+  ignore_errors: True
+
+- name: Set Boolean
+  seboolean:
+    name: "{{item}}"
+    state: no 
+    persistent: yes
+  with_items:
+   - selinuxuser_execstack
+   - selinuxuser_execheap
+   - virt_use_usb
+  ignore_errors: True
+

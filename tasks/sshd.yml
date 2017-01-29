@@ -1,0 +1,106 @@
+---
+# tasks file for sshd
+- include_vars: "pci-dss.yml" 
+  when: security_standard == "pci-dss"            
+
+- include_vars: "stig-rhel7.yml"
+  when: security_standard == "stig-rhel7" 
+
+- include_vars: "rht-ccp.yml"
+  when: security_standard == "rht-ccp"
+
+- name: Set banner
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^Banner'
+    insertafter: '#Banner none'
+    line: 'Banner /etc/issue'
+
+- name: Set Banner in config file sshd
+  template: 
+    src: sshd/issue.client
+    dest: /etc/issue 
+    owner: root 
+    group: root
+  notify:
+  - restart sshd
+
+- name: Set strong ciphers
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^Ciphers'
+    insertafter: '^# Cipheres and keying'
+    line: 'Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc'
+  notify:
+  - restart sshd
+
+- name: Set SSH idle timeout interval
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^ClientAliveInterval'
+    insertafter: '^# ClientAliveInterval'
+    line: 'ClientAliveInterval {{ client_alive_interval }}'
+  notify:
+  - restart sshd
+
+- name: Set MACs
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^MACs'
+    line: 'MACs hmac-sha2-512,hmac-sha2-256,hmac-sha1'
+  notify:
+  - restart sshd
+
+- name: Allow only SSH 2
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^Protocol'
+    insertafter: '^#Protocol'
+    line: 'Protocol 2'
+  notify:
+  - restart sshd
+
+- name: Disabled X11 forwarding
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^X11Forwarding'
+    line: 'X11Forwarding no'
+  notify:
+  - restart sshd
+
+- name: Disable empty password
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^PermitEmptyPasswords'
+    insertafter: '^#PermitEmptyPasswords'
+    line: 'PermitEmptyPasswords no'
+  notify:
+  - restart sshd
+
+- name: This ensures a user login will be terminated as soon as the ClientAliveCountMax is reached
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^ClientAliveCountMax'
+    insertafter: '^#ClientAliveCountMax'
+    line: 'ClientAliveCountMax 0'
+  notify:
+  - restart sshd
+
+- name: SSH environment options potentially allow users to bypass access restriction in some configurations 
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^PermitUserEnvironment'
+    insertafter: '^# PermitUserEnvironement'
+    line: 'PermitUserEnvironment no'
+  notify:
+  - restart sshd
+
+- name: Open port ssh
+  firewalld:
+    port: 22/tcp
+    permanent: true
+    state: enabled
+    zone: public
+    immediate: yes
+  ignore_errors: True
+

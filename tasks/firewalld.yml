@@ -1,0 +1,23 @@
+---
+# tasks file for firewalld
+
+- name: Install firewalld
+  package:
+    name: firewalld
+    state: latest 
+
+- name: Enable firewalld
+  service: 
+    name: firewalld 
+    enabled: yes 
+    state: started
+
+- name: Allow ssh on firewalld
+  firewalld: 
+    service: ssh 
+    permanent: true 
+    state: enabled 
+    zone: public 
+    immediate: yes
+
+

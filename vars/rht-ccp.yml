@@ -1,0 +1,17 @@
+---
+# vars file for ssh
+client_alive_interval: 300
+
+# vars file for pam
+pass_max_days: 60
+pass_min_days: 7
+account_inactive: 35
+pass_strength_min_digit: "-1"
+pass_length_min: 6
+pass_strenght_min_uppercase: "-2"
+pass_strenght_min_lowercase: "-2"
+pass_strenght_min_special: "-2"
+
+password_deny_fail: 5
+password_unlock_time: 604800
+password_fail_interval: 900

@@ -1,0 +1,25 @@
+---
+# handlers file for aide
+- name: prelink
+  command: /usr/sbin/prelink -ua
+
+- name: init aide
+  command: /usr/sbin/aide --init
+  ignore_errors: True
+
+- name: check aide
+  command: /usr/sbin/aide --check
+  ignore_errors: True
+
+# handlers file for auditd hardening
+- name: restart auditd
+  command: "auditctl -R /etc/audit/rules.d/audit.rules"
+
+# handlers file for sysctl hardening
+- name: remount proc
+  command: "mount -o remount,rw,hidepid=2 /proc"
+
+# handlers file for sshd hardening
+- name: restart sshd
+  service: name=sshd state=restarted
+

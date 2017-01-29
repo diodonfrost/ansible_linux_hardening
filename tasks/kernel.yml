@@ -1,0 +1,147 @@
+---
+# tasks file for sysctl
+
+- name: Manage hardening sysctl
+  sysctl:
+    name: "{{ item }}"
+    value: 0
+    state: present
+  with_items:
+    - net.ipv4.ip_forward
+    - net.ipv4.conf.all.send_redirects
+    - net.ipv4.conf.default.send_redirects
+    - net.ipv4.conf.all.accept_source_route
+    - net.ipv4.conf.default.accept_source_route
+    - net.ipv4.conf.all.accept_redirects
+    - net.ipv4.conf.all.secure_redirects
+    - net.ipv4.conf.default.accept_redirects
+    - net.ipv4.conf.default.secure_redirects
+    - net.ipv6.conf.all.router_solicitations
+    - net.ipv6.conf.default.router_solicitations
+    - net.ipv6.conf.all.accept_ra_rtr_pref
+    - net.ipv6.conf.default.accept_ra_rtr_pref
+    - net.ipv6.conf.all.accept_ra_pinfo
+    - net.ipv6.conf.default.accept_ra_pinfo
+    - net.ipv6.conf.all.accept_ra_defrtr
+    - net.ipv6.conf.default.accept_ra_defrtr
+    - net.ipv6.conf.all.autoconf
+    - net.ipv6.conf.default.autoconf
+    - net.ipv6.conf.all.accept_redirects
+    - net.ipv6.conf.default.accept_redirects
+    - net.ipv6.conf.all.accept_source_route
+    - net.ipv6.conf.default.accept_source_route
+    - kernel.sysrq
+    - fs.suid_dumpable
+
+- name: Manage hardening sysctl
+  sysctl:
+    name: "{{ item }}"
+    value: 1
+    state: present
+  with_items:
+    - net.ipv4.conf.all.rp_filter
+    - net.ipv4.conf.default.rp_filter
+    - net.ipv4.conf.all.log_martians
+    - net.ipv4.tcp_rfc1337
+    - net.ipv4.icmp_ignore_bogus_error_responses
+    - net.ipv4.tcp_syncookies
+    - net.ipv6.conf.all.max_addresses
+    - net.ipv6.conf.default.max_addresses
+    - net.ipv6.conf.all.disable_ipv6
+    - kernel.kptr_restrict
+    - kernel.dmesg_restrict
+    - kernel.perf_event_max_sample_rate
+    - kernel.perf_cpu_time_max_percent
+
+- name: Specifies the minimum virtual address that a process is allowed to mmap
+  sysctl: 
+    name: vm.mmap_min_addr
+    value: 65536
+    state: present
+
+- name: Increase Process Identifiers Limit
+  sysctl: 
+    name: kernel.pid_max
+    value: 65536
+    state: present
+
+- name: Block kernel profiling access
+  sysctl: 
+    name: kernel.perf_event_paranoid
+    value: 2
+    state: present
+
+- name: enable ASLR
+  sysctl: 
+    name: kernel.randomize_va_space
+    value: 2
+    state: present
+
+- name: Ignore icmp broadcast
+  sysctl: 
+    name: net.ipv4.icmp_echo_ignore_broadcasts
+    value: 1
+    state: present
+  when: security_standard == "stig-rhel7"
+ 
+- name: insert/update fstab configuation block in /etc/fstab for hidde process
+  blockinfile:
+   dest: /etc/fstab
+   block: |
+    proc /proc proc defaults,hidepid=2 0 0
+  notify: remount proc
+
+- name: Disable usb device on kernel
+  kernel_blacklist: 
+    name: usb-storage
+    state: absent
+
+
+### Disable protocol and kernel module
+
+- name: Disable dccp protocol
+  template:
+    src: kernel/dccp.conf.client
+    dest: /etc/modprobe.d/dccp.conf
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  when: security_standard == "stig-rhel7" or security_standard == "rht-ccp"
+
+- name: Disable sctp protocol
+  template:
+    src: kernel/sctp.conf.client
+    dest: /etc/modprobe.d/sctp.conf
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  when: security_standard == "stig-rhel7" or security_standard == "rht-ccp"
+
+- name: Disable usb hot-plug
+  template:
+    src: kernel/usb-storage.conf.client
+    dest: /etc/modprobe.d/usb-storage.conf
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  when: security_standard == "stig-rhel7"
+
+- name: Disable bluetooth
+  template:
+    src: kernel/bluetooth.conf.client
+    dest: /etc/modprobe.d/bluetooth.conf
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  when: security_standard == "stig-rhel7"
+
+- name: Disable kdump
+  service:
+    name: kdump
+    state: stopped
+    enabled: no
+  when: security_standard == "stig-rhel7"
+
+
+
+

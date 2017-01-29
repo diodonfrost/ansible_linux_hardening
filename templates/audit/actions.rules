@@ -1,0 +1,1 @@
+-w /etc/sudoers -p wa -k actions

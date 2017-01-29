@@ -1,0 +1,4 @@
+
+# Set the audit.rules configuration immutable per security requirements
+# Reboot is required to change audit rules once this setting is applied
+-e 2
