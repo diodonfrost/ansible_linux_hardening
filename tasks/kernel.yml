@@ -54,36 +54,36 @@
     - kernel.perf_cpu_time_max_percent
 
 - name: Specifies the minimum virtual address that a process is allowed to mmap
-  sysctl: 
+  sysctl:
     name: vm.mmap_min_addr
     value: 65536
     state: present
 
 - name: Increase Process Identifiers Limit
-  sysctl: 
+  sysctl:
     name: kernel.pid_max
     value: 65536
     state: present
 
 - name: Block kernel profiling access
-  sysctl: 
+  sysctl:
     name: kernel.perf_event_paranoid
     value: 2
     state: present
 
 - name: enable ASLR
-  sysctl: 
+  sysctl:
     name: kernel.randomize_va_space
     value: 2
     state: present
 
 - name: Ignore icmp broadcast
-  sysctl: 
+  sysctl:
     name: net.ipv4.icmp_echo_ignore_broadcasts
     value: 1
     state: present
   when: security_standard == "stig-rhel7"
- 
+
 - name: insert/update fstab configuation block in /etc/fstab for hidde process
   blockinfile:
    dest: /etc/fstab
@@ -92,7 +92,7 @@
   notify: remount proc
 
 - name: Disable usb device on kernel
-  kernel_blacklist: 
+  kernel_blacklist:
     name: usb-storage
     state: absent
 
@@ -141,7 +141,3 @@
     state: stopped
     enabled: no
   when: security_standard == "stig-rhel7"
-
-
-
-

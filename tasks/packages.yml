@@ -6,24 +6,3 @@
     name: libreswan
     state: latest
     update_cache: yes
-
-- name: Install chrony for ntp
-  yum:
-    name: chrony
-    state: latest
-    update_cache: yes
-
-- name: enable chronyd
-  service:
-    name: chronyd 
-    enabled: yes
-    state: started
-
-- name: Instal screen package
-  yum:
-    name: screen
-    state: latest
-    update_cache: yes
-  when: security_standard == "stig-rhel7" 
-
-

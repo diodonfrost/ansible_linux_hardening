@@ -1,0 +1,14 @@
+---
+# tasks file for ntp service
+
+- name: Install ntp
+  yum:
+    name: ntp
+    state: latest
+    update_cache: yes
+
+- name: enable ntpd
+  service:
+    name: ntpd
+    enabled: yes
+    state: started

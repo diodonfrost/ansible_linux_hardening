@@ -25,4 +25,4 @@
     - /var/log/cron
     - /var/log/boot.log
   when: security_standard == "pci-dss"
-
+  ignore_errors: yes

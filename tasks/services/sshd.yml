@@ -1,10 +1,11 @@
 ---
 # tasks file for sshd
-- include_vars: "pci-dss.yml" 
-  when: security_standard == "pci-dss"            
+
+- include_vars: "pci-dss.yml"
+  when: security_standard == "pci-dss"
 
 - include_vars: "stig-rhel7.yml"
-  when: security_standard == "stig-rhel7" 
+  when: security_standard == "stig-rhel7"
 
 - include_vars: "rht-ccp.yml"
   when: security_standard == "rht-ccp"
@@ -17,10 +18,10 @@
     line: 'Banner /etc/issue'
 
 - name: Set Banner in config file sshd
-  template: 
+  template:
     src: sshd/issue.client
-    dest: /etc/issue 
-    owner: root 
+    dest: /etc/issue
+    owner: root
     group: root
   notify:
   - restart sshd
@@ -86,7 +87,7 @@
   notify:
   - restart sshd
 
-- name: SSH environment options potentially allow users to bypass access restriction in some configurations 
+- name: SSH environment options potentially allow users to bypass access restriction in some configurations
   lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^PermitUserEnvironment'
@@ -103,4 +104,3 @@
     zone: public
     immediate: yes
   ignore_errors: True
-

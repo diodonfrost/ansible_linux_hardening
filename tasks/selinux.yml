@@ -2,7 +2,7 @@
 # tasks file for SELinux
 
 - name: selinux config
-  selinux: 
+  selinux:
     policy: targeted
     state: enforcing
   notify: reboot computer
@@ -22,7 +22,7 @@
 - name: Set boolean
   seboolean:
     name: "{{item}}"
-    state: yes 
+    state: yes
     persistent: yes
   with_items:
    - deny_ptrace
@@ -31,11 +31,10 @@
 - name: Set Boolean
   seboolean:
     name: "{{item}}"
-    state: no 
+    state: no
     persistent: yes
   with_items:
    - selinuxuser_execstack
    - selinuxuser_execheap
    - virt_use_usb
   ignore_errors: True
-

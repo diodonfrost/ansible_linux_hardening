@@ -1,13 +1,8 @@
 ---
 # tasks file for system update be carrefull when you use it
 
-#- name: yum update
-#  yum: 
-#    name: "*" 
-#    state: latest 
-#    update_cache: yes
-
 - name: yum update
-  shell: "yum check-update ; yum update -y"
-
-
+  yum:
+    name: "*"
+    state: latest
+    update_cache: yes
