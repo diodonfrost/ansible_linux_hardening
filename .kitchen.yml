@@ -1,0 +1,38 @@
+---
+# we use docker as plateform
+driver:
+  name: vagrant
+
+# Ansible will be our provisioner
+provisioner:
+  name: ansible_playbook
+  hosts: localhost
+  require_chef_for_busser: false
+  require_ruby_for_busser: false
+  require_ansible_omnibus: false
+
+platforms:
+  - name: centos-7
+# Run test on centos 6 and centos 7
+#platforms:
+#  - name: centos-7
+    # Systemd configuration in docker
+#    driver:
+#      run_command: '/usr/sbin/init'
+#    driver_config:
+#      privileged: true
+#      volume: /sys/fs/cgroup:/sys/fs/cgroup
+#  - name: centos-6
+
+# We use Inspec as testing framework
+verifier:
+  name: inspec
+  inspec_tests:
+    - path: tests/inspec
+
+# Define playbook
+suites:
+  - name: default
+    provisioner:
+      name: ansible_playbook
+      playbook: tests/test.yml

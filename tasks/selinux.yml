@@ -5,7 +5,6 @@
   selinux:
     policy: targeted
     state: enforcing
-  notify: reboot computer
 
 - name: install tools for manage selinux
   package:

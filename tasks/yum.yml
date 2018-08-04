@@ -6,3 +6,9 @@
     name: libreswan
     state: latest
     update_cache: yes
+
+- name: yum update
+  yum:
+    name: "*"
+    state: latest
+    update_cache: yes

@@ -12,14 +12,16 @@
 - import_tasks: firewalld.yml
   tags:
     - firewalld
+  when: ansible_virtualization_type != 'docker'
 
 - import_tasks: kernel.yml
   tags:
     - kernel
 
-- import_tasks: packages.yml
+- import_tasks: yum.yml
   tags:
-    - packages
+    - yum
+  when: ansible_os_family == 'RedHat'
 
 - import_tasks: pam.yml
   tags:
@@ -40,7 +42,3 @@
 - import_tasks: services/sshd.yml
   tags:
     - sshd
-
-- import_tasks: update_system.yml
-  tags:
-    - update_system
