@@ -13,16 +13,6 @@ provisioner:
 
 platforms:
   - name: centos-7
-# Run test on centos 6 and centos 7
-#platforms:
-#  - name: centos-7
-    # Systemd configuration in docker
-#    driver:
-#      run_command: '/usr/sbin/init'
-#    driver_config:
-#      privileged: true
-#      volume: /sys/fs/cgroup:/sys/fs/cgroup
-#  - name: centos-6
 
 # We use Inspec as testing framework
 verifier:
@@ -32,7 +22,21 @@ verifier:
 
 # Define playbook
 suites:
-  - name: default
+  - name: pci-dss
     provisioner:
       name: ansible_playbook
       playbook: tests/test.yml
+      extra_vars:
+        security_standard: "pci-dss"
+  - name: rht-ccp
+    provisioner:
+      name: ansible_playbook
+      playbook: tests/test.yml
+      extra_vars:
+        security_standard: "rht-ccp"
+  - name: stig-rhel7
+    provisioner:
+      name: ansible_playbook
+      playbook: tests/test.yml
+      extra_vars:
+        security_standard: "stig-rhel7"

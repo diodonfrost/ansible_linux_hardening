@@ -1,6 +1,4 @@
 ---
 - hosts: localhost
-  vars:
-    security_standard: "pci-dss"
   roles:
     - ansible_linux_hardening
